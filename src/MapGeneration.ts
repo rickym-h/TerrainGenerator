@@ -4,7 +4,6 @@ export class TerrainGenerator {
 
     XRange: number;
     YRange: number;
-
     OctaveCount: number;
 
     noise2D: NoiseFunction2D;
@@ -22,12 +21,22 @@ export class TerrainGenerator {
 
         let cumulativeHeight = 0;
 
-        for (let Octave = 0; Octave < this.OctaveCount; Octave++) {
-            let OctaveFrequency = 0.05;
-            let OctaveAmplitude = 30;
+        for (let Octave = 1; Octave <= this.OctaveCount; Octave++) {
+            let OctaveFrequency = this.getOctaveFrequency(Octave);
+            let OctaveAmplitude = this.getOctaveAmplitude(Octave);
             cumulativeHeight += this.noise2D(X*OctaveFrequency, Y*OctaveFrequency) * OctaveAmplitude;
         }
 
         return cumulativeHeight;
+    }
+
+    getOctaveFrequency(Octave: number) {
+        let BaseFrequency = 0.05;
+        return BaseFrequency * (Octave**2);
+    }
+
+    getOctaveAmplitude(Octave: number) {
+        let BaseAmplitude = 2;
+        return BaseAmplitude / (Octave**2);
     }
 }

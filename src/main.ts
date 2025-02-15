@@ -20,7 +20,7 @@ function init() {
 
 
     camera = new THREE.PerspectiveCamera( 60, window.innerWidth / window.innerHeight, 1, 2000 );
-    camera.position.set( 0, 200, - 400 );
+    camera.position.set( 0, 50, -70 );
 
     // controls
     controls = new MapControls( camera, renderer.domElement );
@@ -42,22 +42,25 @@ function init() {
     mesh.updateMatrix();
     //scene.add( mesh );
 
-    const xVertices = 100;
-    const yVertices = 100;
+    const xVertices = 1000;
+    const yVertices = 1000;
 
-    const terrainGeometry = new THREE.PlaneGeometry( 1000, 1000, xVertices-1, yVertices-1 );
+    const terrainGeometry = new THREE.PlaneGeometry( 100, 100, xVertices-1, yVertices-1 );
     terrainGeometry.rotateX( - Math.PI / 2 ); // Rotate to be flat rather than vertical
 
     const vertices = terrainGeometry.attributes.position.array;
     console.log(vertices)
 
-    let terrainGenerator: TerrainGenerator = new TerrainGenerator(1);
+    let terrainGenerator: TerrainGenerator = new TerrainGenerator(3);
     for (let x = 0; x < xVertices; x++) {
         for (let y = 0; y < yVertices; y++) {
             let index = 3*x + (y * xVertices * 3);
-            vertices[index + 1] = terrainGenerator.getHeightAtLocation(x, y);
+            vertices[index + 1] = terrainGenerator.getHeightAtLocation(vertices[index], vertices[index+2]);
         }
     }
+
+    geometry.computeVertexNormals();
+
     console.log(vertices)
     const plane = new THREE.Mesh( terrainGeometry, material );
     scene.add(plane);
