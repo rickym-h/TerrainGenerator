@@ -1,5 +1,6 @@
 import * as THREE from 'three';
 import { MapControls } from 'three/addons/controls/MapControls.js';
+import {TerrainGenerator} from "./MapGeneration.ts";
 
 let camera: THREE.PerspectiveCamera, controls: MapControls, scene: THREE.Scene, renderer: THREE.WebGLRenderer;
 
@@ -39,7 +40,27 @@ function init() {
     mesh.scale.y = 100;
     mesh.scale.z = 100;
     mesh.updateMatrix();
-    scene.add( mesh );
+    //scene.add( mesh );
+
+    const xVertices = 100;
+    const yVertices = 100;
+
+    const terrainGeometry = new THREE.PlaneGeometry( 1000, 1000, xVertices-1, yVertices-1 );
+    terrainGeometry.rotateX( - Math.PI / 2 ); // Rotate to be flat rather than vertical
+
+    const vertices = terrainGeometry.attributes.position.array;
+    console.log(vertices)
+
+    let terrainGenerator: TerrainGenerator = new TerrainGenerator();
+    for (let x = 0; x < xVertices; x++) {
+        for (let y = 0; y < yVertices; y++) {
+            let index = 3*x + (y * xVertices * 3);
+            vertices[index + 1] = terrainGenerator.getHeightAtLocation(x, y);
+        }
+    }
+    console.log(vertices)
+    const plane = new THREE.Mesh( terrainGeometry, material );
+    scene.add(plane);
 
     // lights
     const dirLight1 = new THREE.DirectionalLight( 0xffffff, 3 );
