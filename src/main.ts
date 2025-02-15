@@ -51,7 +51,7 @@ function init() {
     const vertices = terrainGeometry.attributes.position.array;
     console.log(vertices)
 
-    let terrainGenerator: TerrainGenerator = new TerrainGenerator();
+    let terrainGenerator: TerrainGenerator = new TerrainGenerator(1);
     for (let x = 0; x < xVertices; x++) {
         for (let y = 0; y < yVertices; y++) {
             let index = 3*x + (y * xVertices * 3);
