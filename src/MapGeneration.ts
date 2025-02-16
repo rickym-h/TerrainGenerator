@@ -17,6 +17,20 @@ export class TerrainGenerator {
         this.noise2D = createNoise2D();
     }
 
+    getHeightMap(width: number, height: number) {
+
+        let map: number[][] = [];
+
+        for (let x = 0; x < width; x++) {
+            map[x] = []
+            for (let y = 0; y < height; y++) {
+                map[x][y] = this.getHeightAtLocation(x, y);
+            }
+        }
+
+        return map;
+    }
+
     getHeightAtLocation(X: number, Y: number) {
 
         let cumulativeHeight = 0;
@@ -31,7 +45,7 @@ export class TerrainGenerator {
     }
 
     getOctaveFrequency(Octave: number) {
-        let BaseFrequency = 0.05;
+        let BaseFrequency = 0.01;
         return BaseFrequency * (Octave**2);
     }
 
