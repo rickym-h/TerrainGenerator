@@ -32,37 +32,52 @@ function init() {
     controls.maxPolarAngle = Math.PI / 2;
 
     // world
-    const geometry = new THREE.BoxGeometry();
-    const material = new THREE.MeshPhongMaterial( { color: 0xeeeeee, flatShading: true } );
+    const width = 100;
+    const height = 100;
+    const xVertices = 500;
+    const yVertices = 500;
 
-    const mesh = new THREE.Mesh( geometry, material );
-    mesh.scale.x = 100;
-    mesh.scale.y = 100;
-    mesh.scale.z = 100;
-    mesh.updateMatrix();
-    //scene.add( mesh );
+    // Texture and canvas
+    const canvas = document.createElement( 'canvas' );
+    canvas.width = xVertices;
+    canvas.height = yVertices;
+    let context = canvas.getContext( '2d' );
+    // @ts-ignore
+    context.fillStyle = '#fff';
+    // @ts-ignore
+    //let image = context.getImageData(0, 0, canvas.width, canvas.height);
 
-    const xVertices = 1000;
-    const yVertices = 1000;
+    // @ts-ignore
+    context.fillRect( 0, 0, canvas.width, canvas.height );
 
-    const terrainGeometry = new THREE.PlaneGeometry( 100, 100, xVertices-1, yVertices-1 );
+    // Terrain heightmap
+    const terrainGeometry = new THREE.PlaneGeometry( width, height, xVertices-1, yVertices-1 );
     terrainGeometry.rotateX( - Math.PI / 2 ); // Rotate to be flat rather than vertical
-
     const vertices = terrainGeometry.attributes.position.array;
-    console.log(vertices)
 
     let terrainGenerator: TerrainGenerator = new TerrainGenerator(3);
     for (let x = 0; x < xVertices; x++) {
         for (let y = 0; y < yVertices; y++) {
-            let index = 3*x + (y * xVertices * 3);
-            vertices[index + 1] = terrainGenerator.getHeightAtLocation(vertices[index], vertices[index+2]);
+            let heightmapIndex = 3*x + (y * xVertices * 3); // Multiplied by 3 because the data is in XYZ format.
+            let height = terrainGenerator.getHeightAtLocation(vertices[heightmapIndex], vertices[heightmapIndex+2]);
+            vertices[heightmapIndex + 1] = height;
+
+
+            // let textureIndex = 4*x + (y * xVertices * 4); // Multiplied by 4 because the data is in RGBA format.
+            if (height > 0) {
+                // @ts-ignore
+                context.fillStyle = "red";
+                // @ts-ignore
+                context.fillRect(x, y, 1, 1);
+            } else {
+            }
         }
     }
 
-    geometry.computeVertexNormals();
+    terrainGeometry.computeVertexNormals();
 
-    console.log(vertices)
-    const plane = new THREE.Mesh( terrainGeometry, material );
+    let texture = new THREE.CanvasTexture(canvas);
+    const plane = new THREE.Mesh( terrainGeometry, new THREE.MeshBasicMaterial( { map: texture }  ));
     scene.add(plane);
 
     // lights
